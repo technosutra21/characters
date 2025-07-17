@@ -26,6 +26,7 @@ const CharacterViewer = () => {
   const [sortBy, setSortBy] = useState('name');
   const [filterBy, setFilterBy] = useState('all');
   const [showStats, setShowStats] = useState(false);
+  const [animationSpeed, setAnimationSpeed] = useState('normal');
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const parser = new CharacterParser();
