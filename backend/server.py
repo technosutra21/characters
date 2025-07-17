@@ -80,6 +80,56 @@ class CharacterSimilarity(BaseModel):
     content_similarities: List[Dict[str, Any]]
     overall_similarity: float
 
+# Character file endpoints
+@api_router.get("/characters/file/{filename}")
+async def get_character_file(filename: str):
+    """Get character file content"""
+    try:
+        # Construct the file path
+        characters_dir = ROOT_DIR / "data" / "characters" / "characters"
+        file_path = characters_dir / filename
+        
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="Character file not found")
+        
+        # Read and return the file content
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        return PlainTextResponse(content=content, media_type="text/plain; charset=utf-8")
+        
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Character file not found")
+    except Exception as e:
+        logger.error(f"Error reading character file {filename}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error reading character file")
+
+@api_router.get("/characters/files")
+async def list_character_files():
+    """List all available character files"""
+    try:
+        characters_dir = ROOT_DIR / "data" / "characters" / "characters"
+        
+        if not characters_dir.exists():
+            raise HTTPException(status_code=404, detail="Characters directory not found")
+        
+        files = []
+        for file_path in characters_dir.glob("*_Perfil.txt"):
+            files.append({
+                "filename": file_path.name,
+                "size": file_path.stat().st_size,
+                "modified": file_path.stat().st_mtime
+            })
+        
+        return {
+            "files": files,
+            "total": len(files)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error listing character files: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error listing character files")
+
 # Character endpoints
 @api_router.get("/characters", response_model=CharacterList)
 async def get_characters(
