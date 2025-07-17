@@ -6,7 +6,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime
 from services.character_parser import CharacterParser
@@ -51,10 +51,33 @@ class Character(BaseModel):
     title: str
     sections: List[CharacterSection]
     file_path: Optional[str] = None
+    word_count: Optional[int] = None
+    section_count: Optional[int] = None
 
 class CharacterList(BaseModel):
     characters: List[Character]
     total: int
+
+class CharacterMetrics(BaseModel):
+    total_characters: int
+    total_sections: int
+    total_words: int
+    avg_sections_per_character: float
+    avg_words_per_character: float
+    most_common_sections: Dict[str, int]
+    character_types: Dict[str, int]
+    common_themes: List[Dict[str, Any]]
+    section_diversity: int
+    unique_sections: List[str]
+
+class CharacterSimilarity(BaseModel):
+    character1: str
+    character2: str
+    common_sections: List[str]
+    unique_to_char1: List[str]
+    unique_to_char2: List[str]
+    content_similarities: List[Dict[str, Any]]
+    overall_similarity: float
 
 # Character endpoints
 @api_router.get("/characters", response_model=CharacterList)
@@ -83,6 +106,40 @@ async def get_characters(
     except Exception as e:
         logger.error(f"Error getting characters: {str(e)}")
         raise HTTPException(status_code=500, detail="Error retrieving characters")
+
+@api_router.get("/characters/metrics", response_model=CharacterMetrics)
+async def get_character_metrics():
+    """Get metrics and analytics about all characters"""
+    try:
+        metrics_data = character_parser.get_character_metrics()
+        
+        if not metrics_data:
+            raise HTTPException(status_code=404, detail="No character data found for metrics")
+        
+        return CharacterMetrics(**metrics_data)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting character metrics: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error retrieving character metrics")
+
+@api_router.get("/characters/similarity/{char1_id}/{char2_id}", response_model=CharacterSimilarity)
+async def get_character_similarity(char1_id: str, char2_id: str):
+    """Get similarity analysis between two characters"""
+    try:
+        similarity_data = character_parser.find_similarities_between_characters(char1_id, char2_id)
+        
+        if not similarity_data:
+            raise HTTPException(status_code=404, detail="One or both characters not found")
+        
+        return CharacterSimilarity(**similarity_data)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting character similarity: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error retrieving character similarity")
 
 @api_router.get("/characters/{character_id}", response_model=Character)
 async def get_character(character_id: str):
@@ -150,7 +207,7 @@ async def health_check():
 # Original endpoints
 @api_router.get("/")
 async def root():
-    return {"message": "Character Viewer API - Ready to serve dynamic content from txt files"}
+    return {"message": "Character Viewer API - Enhanced with metrics and similarity analysis"}
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
