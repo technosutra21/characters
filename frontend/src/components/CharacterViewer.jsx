@@ -333,12 +333,15 @@ const CharacterViewer = () => {
                 </div>
 
                 {/* Floating Cards Layout */}
-                <div className="relative min-h-screen">
+                <div className="relative w-full" style={{ 
+                  minHeight: `${Math.ceil(selectedCharacter.sections.length / Math.ceil(Math.sqrt(selectedCharacter.sections.length))) * 500 + 200}px`,
+                  width: `${Math.ceil(Math.sqrt(selectedCharacter.sections.length)) * 400 + 200}px`
+                }}>
                   {selectedCharacter.sections.map((section, index) => (
                     <Card 
                       key={index}
-                      className="w-80 bg-gray-900/40 backdrop-blur-md border-gray-700/40 hover:bg-gray-900/60 transition-all duration-700 transform hover:scale-110 hover:shadow-2xl hover:shadow-purple-500/30 floating-card"
-                      style={getFloatingCardStyle(index)}
+                      className="w-80 bg-gray-900/40 backdrop-blur-md border-gray-700/40 hover:bg-gray-900/60 transition-all duration-700 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/30 floating-card"
+                      style={getFloatingCardStyle(index, selectedCharacter.sections.length)}
                     >
                       <CardHeader className="pb-3">
                         <CardTitle className="flex items-center space-x-2 text-lg font-light">
@@ -348,21 +351,21 @@ const CharacterViewer = () => {
                           </span>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="max-h-96 overflow-y-auto">
-                        <div className="space-y-4">
+                      <CardContent className="max-h-80 overflow-y-auto custom-scrollbar">
+                        <div className="space-y-3">
                           {section.content.map((item, itemIndex) => (
                             <div 
                               key={itemIndex}
-                              className="p-4 bg-black/30 rounded-lg border border-gray-700/20 hover:border-purple-500/30 transition-all duration-300"
+                              className="p-3 bg-black/30 rounded-lg border border-gray-700/20 hover:border-purple-500/30 transition-all duration-300"
                             >
                               {item.subtitle && (
-                                <h4 className="font-medium text-purple-300 mb-3 text-sm">
+                                <h4 className="font-medium text-purple-300 mb-2 text-sm">
                                   {item.subtitle}
                                 </h4>
                               )}
                               <div className="text-gray-300 text-sm leading-relaxed">
                                 {item.text.split('\n').map((line, lineIndex) => (
-                                  <p key={lineIndex} className="mb-2 last:mb-0">
+                                  <p key={lineIndex} className="mb-1 last:mb-0">
                                     {line}
                                   </p>
                                 ))}
