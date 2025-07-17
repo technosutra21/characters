@@ -141,20 +141,29 @@ const CharacterViewer = () => {
     return <BookOpen className="w-5 h-5" />;
   };
 
-  const getFloatingCardStyle = (index) => {
-    const angles = [0, 60, 120, 180, 240, 300];
-    const angle = angles[index % angles.length];
-    const radius = 150 + (index * 30);
-    const x = Math.cos((angle * Math.PI) / 180) * radius;
-    const y = Math.sin((angle * Math.PI) / 180) * radius;
+  const getFloatingCardStyle = (index, totalCards) => {
+    const cols = Math.ceil(Math.sqrt(totalCards));
+    const rows = Math.ceil(totalCards / cols);
+    
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+    
+    // Base grid position
+    const baseX = (col * 400) + 50;
+    const baseY = (row * 500) + 50;
+    
+    // Add some randomness for "floating" effect
+    const randomX = (Math.random() - 0.5) * 80;
+    const randomY = (Math.random() - 0.5) * 60;
+    const randomRotation = (Math.random() - 0.5) * 10;
     
     return {
       position: 'absolute',
-      left: '50%',
-      top: '50%',
-      transform: `translate(${x}px, ${y}px) rotate(${index * 5}deg)`,
-      animationDelay: `${index * 0.2}s`,
-      zIndex: 10 - index
+      left: `${baseX + randomX}px`,
+      top: `${baseY + randomY}px`,
+      transform: `rotate(${randomRotation}deg)`,
+      animationDelay: `${index * 0.1}s`,
+      zIndex: 10
     };
   };
 
