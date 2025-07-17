@@ -841,6 +841,13 @@ const CharacterViewer = () => {
         </Tabs>
       </div>
 
+      {/* Stats Panel */}
+      <StatsPanel 
+        characters={characters}
+        isVisible={showStats}
+        onClose={() => setShowStats(false)}
+      />
+
       {/* Enhanced CSS Animations */}
       <style jsx>{`
         @keyframes slideInUp {
