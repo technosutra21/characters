@@ -54,10 +54,13 @@
     "vaul": "^1.1.2",
     "zod": "^3.24.4"
   },
+  "homepage": "https://username.github.io/character-viewer",
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test"
+    "test": "craco test",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "browserslist": {
     "production": [
