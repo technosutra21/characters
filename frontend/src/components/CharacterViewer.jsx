@@ -272,7 +272,7 @@ const CharacterViewer = () => {
               {characters.map((character, index) => (
                 <Card 
                   key={character.id}
-                  className="bg-gray-900/30 backdrop-blur-sm border-gray-700/30 hover:bg-gray-900/50 cursor-pointer transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 group"
+                  className="bg-gray-900/40 backdrop-blur-sm border-gray-700/40 hover:bg-gray-900/60 cursor-pointer transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/30 group overflow-hidden"
                   onClick={() => {
                     setSelectedCharacter(character);
                     setViewMode('detailed');
@@ -282,26 +282,34 @@ const CharacterViewer = () => {
                     animation: 'fadeInUp 0.8s ease-out forwards'
                   }}
                 >
-                  <CardHeader className="pb-3">
+                  <CardHeader className="pb-3 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border-b border-purple-500/10">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-5 h-5 text-purple-400" />
-                        <CardTitle className="text-lg font-light text-purple-300 group-hover:text-purple-200 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-purple-500/20 rounded-lg">
+                          <User className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <CardTitle className="text-lg font-medium text-purple-200 group-hover:text-purple-100 transition-colors">
                           {character.name}
                         </CardTitle>
                       </div>
-                      <Badge variant="secondary" className="bg-cyan-900/20 text-cyan-300 border-cyan-500/30">
+                      <Badge variant="secondary" className="bg-cyan-900/30 text-cyan-200 border-cyan-500/30">
                         {character.section_count || character.sections.length}
                       </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+                  <CardContent className="p-4">
+                    <p className="text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
                       {character.title}
                     </p>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>{character.word_count} palavras</span>
-                      <span>{character.sections.length} seções</span>
+                    <div className="flex items-center justify-between text-xs text-gray-400 bg-black/20 rounded-lg p-3">
+                      <div className="flex items-center space-x-1">
+                        <BookOpen className="w-3 h-3" />
+                        <span>{character.word_count} palavras</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <BarChart3 className="w-3 h-3" />
+                        <span>{character.sections.length} seções</span>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
