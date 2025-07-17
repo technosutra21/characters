@@ -572,6 +572,16 @@ const CharacterViewer = () => {
               </Button>
               
               <Button
+                onClick={() => setShowStats(true)}
+                variant="outline"
+                size="sm"
+                className="bg-indigo-900/30 hover:bg-indigo-900/50 border-indigo-500/50 text-indigo-300 backdrop-blur-sm"
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Stats
+              </Button>
+              
+              <Button
                 onClick={exportCharacters}
                 variant="outline"
                 size="sm"
