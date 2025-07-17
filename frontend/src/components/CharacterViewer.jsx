@@ -434,6 +434,29 @@ const CharacterViewer = () => {
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
+        
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #6B46C1 #1F2937;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #1F2937;
+          border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #6B46C1;
+          border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #7C3AED;
+        }
       `}</style>
     </div>
   );
