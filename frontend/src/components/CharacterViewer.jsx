@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Sparkles, BookOpen, User, MapPin, Heart, Zap, Loader2, AlertCircle, Grid, BarChart3, Eye, Layout } from 'lucide-react';
+import { Search, Sparkles, BookOpen, User, MapPin, Heart, Zap, Loader2, AlertCircle, Grid, BarChart3, Eye, Layout, Upload, FileText, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -7,10 +7,8 @@ import { Alert, AlertDescription } from './ui/alert';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import MasonryCards from './MasonryCards';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { CharacterParser } from '../services/CharacterParser';
+import { FileLoader } from '../services/FileLoader';
 
 const CharacterViewer = () => {
   const [characters, setCharacters] = useState([]);
