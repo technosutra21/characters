@@ -1,36 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Search, Sparkles, BookOpen, User, MapPin, Heart, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Sparkles, BookOpen, User, MapPin, Heart, Zap, Loader2, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { mockCharacters } from '../data/mock';
+import { Alert, AlertDescription } from './ui/alert';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const CharacterViewer = () => {
+  const [characters, setCharacters] = useState([]);
   const [selectedCharacter, setSelectedCharacter] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredCharacters, setFilteredCharacters] = useState(mockCharacters);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentSections, setCurrentSections] = useState([]);
 
+  // Fetch characters from API
+  const fetchCharacters = async (searchQuery = '') => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await axios.get(`${API}/characters`, {
+        params: {
+          search: searchQuery || undefined,
+          limit: 100
+        }
+      });
+      
+      const charactersData = response.data.characters;
+      setCharacters(charactersData);
+      
+      // Reset selected character if search changes
+      if (searchQuery !== searchTerm) {
+        setSelectedCharacter(0);
+      }
+      
+      // Set current sections
+      if (charactersData.length > 0) {
+        const charIndex = Math.min(selectedCharacter, charactersData.length - 1);
+        setCurrentSections(charactersData[charIndex]?.sections || []);
+      }
+      
+    } catch (err) {
+      console.error('Error fetching characters:', err);
+      setError('Erro ao carregar personagens. Verifique se os arquivos txt estão na pasta backend/data/characters/');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial load
   useEffect(() => {
-    const filtered = mockCharacters.filter(char =>
-      char.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      char.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredCharacters(filtered);
+    fetchCharacters();
+  }, []);
+
+  // Handle search
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      fetchCharacters(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
   }, [searchTerm]);
 
+  // Update sections when character changes
   useEffect(() => {
-    if (filteredCharacters[selectedCharacter]) {
-      setCurrentSections(filteredCharacters[selectedCharacter].sections);
+    if (characters[selectedCharacter]) {
+      setCurrentSections(characters[selectedCharacter].sections);
     }
-  }, [selectedCharacter, filteredCharacters]);
+  }, [selectedCharacter, characters]);
 
   const nextCharacter = () => {
-    setSelectedCharacter((prev) => (prev + 1) % filteredCharacters.length);
+    setSelectedCharacter((prev) => (prev + 1) % characters.length);
   };
 
   const prevCharacter = () => {
-    setSelectedCharacter((prev) => (prev - 1 + filteredCharacters.length) % filteredCharacters.length);
+    setSelectedCharacter((prev) => (prev - 1 + characters.length) % characters.length);
   };
 
   const getSectionIcon = (title) => {
@@ -44,7 +92,47 @@ const CharacterViewer = () => {
     return <BookOpen className="w-5 h-5" />;
   };
 
-  const currentChar = filteredCharacters[selectedCharacter];
+  const currentChar = characters[selectedCharacter];
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-purple-500" />
+          <p className="text-xl text-gray-300">Carregando personagens...</p>
+          <p className="text-sm text-gray-500 mt-2">Processando arquivos txt dinamicamente</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex items-center justify-center p-6">
+        <Alert className="max-w-md bg-red-900/20 border-red-500/50">
+          <AlertCircle className="h-4 w-4 text-red-400" />
+          <AlertDescription className="text-red-200">
+            {error}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  // No characters found
+  if (characters.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex items-center justify-center p-6">
+        <div className="text-center">
+          <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-500" />
+          <p className="text-xl text-gray-300 mb-2">Nenhum personagem encontrado</p>
+          <p className="text-gray-500">Adicione arquivos .txt na pasta backend/data/characters/</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden">
@@ -69,7 +157,7 @@ const CharacterViewer = () => {
               />
             </div>
             <div className="text-sm text-gray-400">
-              {filteredCharacters.length} personagens encontrados
+              {characters.length} personagens encontrados
             </div>
           </div>
           
@@ -78,19 +166,21 @@ const CharacterViewer = () => {
               variant="outline"
               size="sm"
               onClick={prevCharacter}
+              disabled={characters.length <= 1}
               className="bg-gray-800/50 border-gray-700 hover:bg-gray-700/50 transition-all duration-300"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
             
             <div className="text-sm font-medium px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
-              {selectedCharacter + 1} / {filteredCharacters.length}
+              {selectedCharacter + 1} / {characters.length}
             </div>
             
             <Button
               variant="outline"
               size="sm"
               onClick={nextCharacter}
+              disabled={characters.length <= 1}
               className="bg-gray-800/50 border-gray-700 hover:bg-gray-700/50 transition-all duration-300"
             >
               <ChevronRight className="w-4 h-4" />
@@ -155,7 +245,7 @@ const CharacterViewer = () => {
 
           {/* Character Navigation */}
           <div className="mt-12 flex justify-center space-x-2">
-            {filteredCharacters.map((_, index) => (
+            {characters.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedCharacter(index)}
