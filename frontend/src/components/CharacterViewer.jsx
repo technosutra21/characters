@@ -655,7 +655,7 @@ const CharacterViewer = () => {
               {filteredCharacters.map((character, index) => (
                 <Card 
                   key={character.id}
-                  className="group bg-gray-800/30 backdrop-blur-xl border-gray-700/50 hover:bg-gray-800/50 cursor-pointer transition-all duration-700 transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20 overflow-hidden hover:border-cyan-400/50"
+                  className="group relative bg-black/20 backdrop-blur-2xl border border-white/10 hover:border-white/20 cursor-pointer transition-all duration-700 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 overflow-hidden"
                   onClick={() => {
                     setSelectedCharacter(character);
                     setViewMode('detailed');
@@ -665,47 +665,57 @@ const CharacterViewer = () => {
                     animation: 'slideInUp 0.8s ease-out forwards'
                   }}
                 >
-                  <CardHeader className="pb-4 bg-gradient-to-r from-purple-900/40 to-cyan-900/40 border-b border-cyan-500/20">
+                  {/* Glassmorphism overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent group-hover:from-white/10 transition-all duration-300"></div>
+                  
+                  {/* Glow effect */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  
+                  <CardHeader className="relative z-10 pb-4 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 backdrop-blur-sm border-b border-white/10">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className="relative p-3 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-xl group-hover:from-cyan-500/30 group-hover:to-purple-500/30 transition-all duration-300">
-                          <User className="w-6 h-6 text-cyan-400 drop-shadow-sm" />
-                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="relative p-3 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl backdrop-blur-sm border border-white/10 group-hover:scale-110 transition-transform duration-300">
+                          <User className="w-6 h-6 text-cyan-300 drop-shadow-sm" />
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg shadow-pink-500/50"></div>
                         </div>
                         <div>
-                          <CardTitle className="text-xl font-medium text-white group-hover:text-cyan-100 transition-colors duration-300">
+                          <CardTitle className="text-xl font-semibold bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-cyan-200 group-hover:to-purple-200 transition-all duration-300">
                             {character.name}
                           </CardTitle>
-                          <p className="text-sm text-gray-400 mt-1">{character.title}</p>
+                          <p className="text-sm text-gray-300/80 mt-1 font-medium">{character.title}</p>
                         </div>
                       </div>
                       <div className="flex flex-col items-end space-y-2">
-                        <Badge variant="secondary" className="bg-cyan-900/50 text-cyan-200 border-cyan-500/50 px-3 py-1">
-                          {character.sections.length} seções
-                        </Badge>
-                        <div className="flex items-center space-x-1 text-xs text-gray-400">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span>Mítico</span>
+                        <div className="px-3 py-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full border border-cyan-500/30 backdrop-blur-sm">
+                          <span className="text-xs font-semibold text-cyan-200">{character.sections.length} seções</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <div className="w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full shadow-lg shadow-yellow-400/50"></div>
+                          <span className="text-xs text-gray-300/80 font-medium">Mítico</span>
                         </div>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-6">
+                  <CardContent className="relative z-10 p-6">
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between text-sm text-gray-300 bg-gray-900/30 rounded-lg p-4 backdrop-blur-sm">
+                      <div className="flex items-center justify-between text-sm bg-black/20 backdrop-blur-sm rounded-2xl p-4 border border-white/5">
                         <div className="flex items-center space-x-2">
-                          <BookOpen className="w-4 h-4 text-cyan-400" />
-                          <span>{character.word_count.toLocaleString()} palavras</span>
+                          <div className="p-1 bg-gradient-to-r from-cyan-500/20 to-cyan-400/20 rounded-lg">
+                            <BookOpen className="w-4 h-4 text-cyan-300" />
+                          </div>
+                          <span className="text-gray-200 font-medium">{character.word_count.toLocaleString()} palavras</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <BarChart3 className="w-4 h-4 text-purple-400" />
-                          <span>{character.sections.length} seções</span>
+                          <div className="p-1 bg-gradient-to-r from-purple-500/20 to-purple-400/20 rounded-lg">
+                            <BarChart3 className="w-4 h-4 text-purple-300" />
+                          </div>
+                          <span className="text-gray-200 font-medium">{character.sections.length} seções</span>
                         </div>
                       </div>
                       
-                      <div className="flex items-center space-x-2 text-xs text-gray-400">
-                        <Sparkles className="w-3 h-3" />
-                        <span>Última atualização: {new Date().toLocaleDateString()}</span>
+                      <div className="flex items-center space-x-2 text-xs text-gray-400/80">
+                        <div className="w-1 h-1 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full shadow-lg shadow-emerald-400/50"></div>
+                        <span className="font-medium">Atualizado: {new Date().toLocaleDateString()}</span>
                       </div>
                     </div>
                   </CardContent>
