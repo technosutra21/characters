@@ -84,7 +84,7 @@ class CharacterParser:
         return "Nome não encontrado"
 
     def parse_content_into_sections(self, content: str) -> List[Dict[str, Any]]:
-        """Parse content into sections with improved topic detection"""
+        """Parse content into sections with improved topic detection and markdown processing"""
         lines = content.split('\n')
         sections = []
         current_section = None
