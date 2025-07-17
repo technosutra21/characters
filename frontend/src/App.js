@@ -1,11 +1,11 @@
 import React from "react";
 import "./App.css";
-import TechnoSutraGallery from "./components/TechnoSutraGallery";
+import MobileOptimizedGallery from "./components/MobileOptimizedGallery";
 
 function App() {
   return (
     <div className="App">
-      <TechnoSutraGallery />
+      <MobileOptimizedGallery />
     </div>
   );
 }
