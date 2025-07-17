@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Sparkles, BookOpen, User, MapPin, Heart, Zap, Loader2, AlertCircle, Grid, BarChart3, TrendingUp, Users, Eye } from 'lucide-react';
+import { Search, Sparkles, BookOpen, User, MapPin, Heart, Zap, Loader2, AlertCircle, Grid, BarChart3, Eye, Layout } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Alert, AlertDescription } from './ui/alert';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import MasonryCards from './MasonryCards';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -17,8 +18,8 @@ const CharacterViewer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [metrics, setMetrics] = useState({});
   const [viewMode, setViewMode] = useState('gallery'); // 'gallery' or 'detailed'
+  const [layoutMode, setLayoutMode] = useState('masonry'); // 'masonry' or 'floating'
   const canvasRef = useRef(null);
 
   // Fetch characters from API
@@ -50,20 +51,9 @@ const CharacterViewer = () => {
     }
   };
 
-  // Fetch metrics
-  const fetchMetrics = async () => {
-    try {
-      const response = await axios.get(`${API}/characters/metrics`);
-      setMetrics(response.data);
-    } catch (err) {
-      console.error('Error fetching metrics:', err);
-    }
-  };
-
   // Initial load
   useEffect(() => {
     fetchCharacters();
-    fetchMetrics();
   }, []);
 
   // Handle search
@@ -142,20 +132,20 @@ const CharacterViewer = () => {
   };
 
   const getFloatingCardStyle = (index, totalCards) => {
-    const cols = Math.ceil(Math.sqrt(totalCards));
+    const cols = Math.min(4, Math.ceil(Math.sqrt(totalCards)));
     const rows = Math.ceil(totalCards / cols);
     
     const col = index % cols;
     const row = Math.floor(index / cols);
     
-    // Base grid position
-    const baseX = (col * 400) + 50;
-    const baseY = (row * 500) + 50;
+    // Base grid position with proper spacing
+    const baseX = (col * 380) + 50;
+    const baseY = (row * 420) + 50;
     
     // Add some randomness for "floating" effect
-    const randomX = (Math.random() - 0.5) * 80;
-    const randomY = (Math.random() - 0.5) * 60;
-    const randomRotation = (Math.random() - 0.5) * 10;
+    const randomX = (Math.random() - 0.5) * 60;
+    const randomY = (Math.random() - 0.5) * 40;
+    const randomRotation = (Math.random() - 0.5) * 8;
     
     return {
       position: 'absolute',
@@ -211,8 +201,8 @@ const CharacterViewer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
-      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
+    <div className="min-h-screen bg-black text-white">
+      <canvas ref={canvasRef} className="fixed inset-0 z-0" />
       
       {/* Header */}
       <div className="relative z-20 p-6 bg-black/30 backdrop-blur-sm border-b border-gray-800/30">
@@ -291,7 +281,7 @@ const CharacterViewer = () => {
                         </CardTitle>
                       </div>
                       <Badge variant="secondary" className="bg-cyan-900/20 text-cyan-300 border-cyan-500/30">
-                        {character.section_count}
+                        {character.section_count || character.sections.length}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -310,15 +300,38 @@ const CharacterViewer = () => {
           </TabsContent>
 
           {/* Detailed View */}
-          <TabsContent value="detailed" className="space-y-8">
+          <TabsContent value="detailed">
             {selectedCharacter && (
-              <div className="max-w-none">
+              <div className="space-y-8">
                 {/* Character Header */}
                 <div className="text-center mb-12">
                   <h1 className="text-6xl font-light mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                     {selectedCharacter.name}
                   </h1>
                   <p className="text-xl text-gray-300 mb-6">{selectedCharacter.title}</p>
+                  
+                  {/* Layout Toggle */}
+                  <div className="flex items-center justify-center space-x-4 mb-6">
+                    <Button
+                      variant={layoutMode === 'masonry' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setLayoutMode('masonry')}
+                      className="bg-purple-900/20 hover:bg-purple-900/40 border-purple-500/30"
+                    >
+                      <Layout className="w-4 h-4 mr-2" />
+                      Masonry
+                    </Button>
+                    <Button
+                      variant={layoutMode === 'floating' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setLayoutMode('floating')}
+                      className="bg-purple-900/20 hover:bg-purple-900/40 border-purple-500/30"
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Flutuante
+                    </Button>
+                  </div>
+                  
                   <div className="flex items-center justify-center space-x-8 text-sm text-gray-500">
                     <div className="flex items-center space-x-2">
                       <BookOpen className="w-4 h-4" />
@@ -332,53 +345,57 @@ const CharacterViewer = () => {
                   <div className="w-32 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 mx-auto rounded-full mt-6"></div>
                 </div>
 
-                {/* Cards Container with Scroll */}
-                <div className="overflow-x-auto overflow-y-visible pb-20">
-                  <div className="relative mx-auto" style={{ 
-                    minHeight: `${Math.ceil(selectedCharacter.sections.length / Math.ceil(Math.sqrt(selectedCharacter.sections.length))) * 500 + 200}px`,
-                    width: `${Math.ceil(Math.sqrt(selectedCharacter.sections.length)) * 400 + 200}px`
-                  }}>
-                    {selectedCharacter.sections.map((section, index) => (
-                      <Card 
-                        key={index}
-                        className="w-80 bg-gray-900/40 backdrop-blur-md border-gray-700/40 hover:bg-gray-900/60 transition-all duration-700 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/30 floating-card"
-                        style={getFloatingCardStyle(index, selectedCharacter.sections.length)}
-                      >
-                        <CardHeader className="pb-3">
-                          <CardTitle className="flex items-center space-x-2 text-lg font-light">
-                            {getSectionIcon(section.title)}
-                            <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                              {section.title}
-                            </span>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="max-h-80 overflow-y-auto custom-scrollbar">
-                          <div className="space-y-3">
-                            {section.content.map((item, itemIndex) => (
-                              <div 
-                                key={itemIndex}
-                                className="p-3 bg-black/30 rounded-lg border border-gray-700/20 hover:border-purple-500/30 transition-all duration-300"
-                              >
-                                {item.subtitle && (
-                                  <h4 className="font-medium text-purple-300 mb-2 text-sm">
-                                    {item.subtitle}
-                                  </h4>
-                                )}
-                                <div className="text-gray-300 text-sm leading-relaxed">
-                                  {item.text.split('\n').map((line, lineIndex) => (
-                                    <p key={lineIndex} className="mb-1 last:mb-0">
-                                      {line}
-                                    </p>
-                                  ))}
+                {/* Cards Display */}
+                {layoutMode === 'masonry' ? (
+                  <MasonryCards sections={selectedCharacter.sections} getSectionIcon={getSectionIcon} />
+                ) : (
+                  <div className="overflow-x-auto overflow-y-visible pb-20">
+                    <div className="relative mx-auto" style={{ 
+                      minHeight: `${Math.ceil(selectedCharacter.sections.length / Math.min(4, Math.ceil(Math.sqrt(selectedCharacter.sections.length)))) * 420 + 200}px`,
+                      width: `${Math.min(4, Math.ceil(Math.sqrt(selectedCharacter.sections.length))) * 380 + 200}px`
+                    }}>
+                      {selectedCharacter.sections.map((section, index) => (
+                        <Card 
+                          key={index}
+                          className="w-80 bg-gray-900/40 backdrop-blur-md border-gray-700/40 hover:bg-gray-900/60 transition-all duration-700 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/30 floating-card"
+                          style={getFloatingCardStyle(index, selectedCharacter.sections.length)}
+                        >
+                          <CardHeader className="pb-3">
+                            <CardTitle className="flex items-center space-x-2 text-lg font-light">
+                              {getSectionIcon(section.title)}
+                              <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                                {section.title}
+                              </span>
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="max-h-80 overflow-y-auto custom-scrollbar">
+                            <div className="space-y-3">
+                              {section.content.map((item, itemIndex) => (
+                                <div 
+                                  key={itemIndex}
+                                  className="p-3 bg-black/30 rounded-lg border border-gray-700/20 hover:border-purple-500/30 transition-all duration-300"
+                                >
+                                  {item.subtitle && (
+                                    <h4 className="font-medium text-purple-300 mb-2 text-sm">
+                                      {item.subtitle}
+                                    </h4>
+                                  )}
+                                  <div className="text-gray-300 text-sm leading-relaxed">
+                                    {item.text.split('\n').map((line, lineIndex) => (
+                                      <p key={lineIndex} className="mb-1 last:mb-0">
+                                        {line}
+                                      </p>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Character Selection */}
                 <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30">
