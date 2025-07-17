@@ -120,6 +120,16 @@ const CharacterViewer = () => {
     };
   }, []);
 
+  // Function to process markdown-like formatting
+  const processMarkdownText = (text) => {
+    if (!text) return text;
+    
+    // Process **bold** and *italic* formatting
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-purple-200">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="font-semibold text-purple-300">$1</em>');
+  };
+
   const getSectionIcon = (title) => {
     const titleLower = title.toLowerCase();
     if (titleLower.includes('básicas') || titleLower.includes('informações')) return <User className="w-5 h-5" />;
