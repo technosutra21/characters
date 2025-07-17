@@ -367,7 +367,7 @@ const CharacterViewer = () => {
                       {selectedCharacter.sections.map((section, index) => (
                         <Card 
                           key={index}
-                          className="w-80 bg-gray-900/40 backdrop-blur-md border-gray-700/40 hover:bg-gray-900/60 transition-all duration-700 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/30 floating-card"
+                          className="w-80 bg-gray-900/50 backdrop-blur-md border-gray-700/50 hover:bg-gray-900/70 transition-all duration-700 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/30 floating-card overflow-hidden"
                           style={getFloatingCardStyle(index, selectedCharacter.sections.length)}
                         >
                           <CardHeader className="pb-4 bg-gradient-to-r from-purple-900/30 to-cyan-900/30 rounded-t-lg border-b border-purple-500/20">
