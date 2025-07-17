@@ -492,36 +492,45 @@ const CharacterViewer = () => {
   const stats = getCharacterStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 text-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">
       <canvas ref={canvasRef} className="fixed inset-0 z-0" />
       
+      {/* Glassmorphism overlay */}
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-cyan-500/5 backdrop-blur-[1px] z-1"></div>
+      
       {/* Enhanced Header */}
-      <div className="relative z-20 p-6 bg-black/20 backdrop-blur-xl border-b border-white/10">
+      <div className="relative z-20 p-6 bg-black/10 backdrop-blur-2xl border-b border-white/5 shadow-2xl">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-4">
-                <div className="relative">
+                <div className="relative p-2 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 rounded-2xl backdrop-blur-xl border border-white/10">
                   <Sparkles className="w-8 h-8 text-cyan-400 drop-shadow-lg" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full animate-pulse shadow-lg shadow-pink-500/50"></div>
                 </div>
                 <div>
-                  <h1 className="text-4xl font-light bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  <h1 className="text-4xl font-light bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 bg-clip-text text-transparent drop-shadow-sm">
                     Personagens Místicos
                   </h1>
-                  <p className="text-sm text-gray-400 mt-1">Explorador de mundos fantásticos</p>
+                  <p className="text-sm text-gray-300/80 mt-1 font-medium">Explorador de mundos fantásticos</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-4">
-                <Badge variant="outline" className="bg-cyan-900/30 text-cyan-300 border-cyan-500/50 px-4 py-2">
-                  {filteredCharacters.length} personagens
-                </Badge>
+                <div className="px-4 py-2 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-full border border-cyan-500/20 backdrop-blur-xl">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <span className="text-cyan-200 font-medium">{filteredCharacters.length} personagens</span>
+                  </div>
+                </div>
                 
                 {stats && (
-                  <Badge variant="outline" className="bg-purple-900/30 text-purple-300 border-purple-500/50 px-4 py-2">
-                    {stats.totalWords.toLocaleString()} palavras
-                  </Badge>
+                  <div className="px-4 py-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full border border-purple-500/20 backdrop-blur-xl">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                      <span className="text-purple-200 font-medium">{stats.totalWords.toLocaleString()} palavras</span>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -529,43 +538,48 @@ const CharacterViewer = () => {
             <div className="flex items-center space-x-3">
               {/* Enhanced Search */}
               <div className="relative group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 transition-colors group-hover:text-cyan-400" />
-                <Input
-                  placeholder="Buscar personagens místicos..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 pr-4 py-3 w-96 bg-gray-800/50 border-gray-600 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 backdrop-blur-sm text-white placeholder-gray-400"
-                />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-1">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 transition-colors group-hover:text-cyan-400" />
+                  <Input
+                    placeholder="Buscar personagens místicos..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-12 pr-4 py-3 w-96 bg-transparent border-0 focus:border-0 focus:ring-0 text-white placeholder-gray-400 font-medium"
+                  />
+                </div>
               </div>
               
-              {/* Sort & Filter */}
+              {/* Enhanced Action Buttons */}
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setSortBy(sortBy === 'name' ? 'sections' : 'name')}
-                  className="bg-gray-800/50 hover:bg-gray-700/50 border-gray-600 backdrop-blur-sm"
+                  className="bg-black/20 hover:bg-black/40 border-white/10 backdrop-blur-xl hover:border-white/20 transition-all duration-300"
                 >
                   <Filter className="w-4 h-4 mr-2" />
-                  {sortBy === 'name' ? 'Nome' : 'Seções'}
+                  <span className="bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent">
+                    {sortBy === 'name' ? 'Nome' : 'Seções'}
+                  </span>
                 </Button>
                 
                 <Button
                   onClick={shuffleCharacters}
                   variant="outline"
                   size="sm"
-                  className="bg-gray-800/50 hover:bg-gray-700/50 border-gray-600 backdrop-blur-sm"
+                  className="bg-black/20 hover:bg-black/40 border-white/10 backdrop-blur-xl hover:border-white/20 transition-all duration-300 group"
                 >
-                  <Shuffle className="w-4 h-4" />
+                  <Shuffle className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300" />
                 </Button>
               </div>
               
-              {/* Action Buttons */}
+              {/* Enhanced Feature Buttons */}
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 variant="outline"
                 size="sm"
-                className="bg-cyan-900/30 hover:bg-cyan-900/50 border-cyan-500/50 text-cyan-300 backdrop-blur-sm"
+                className="bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 hover:from-cyan-500/20 hover:to-cyan-600/20 border-cyan-500/30 text-cyan-200 backdrop-blur-xl transition-all duration-300"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Carregar
@@ -575,7 +589,7 @@ const CharacterViewer = () => {
                 onClick={() => setShowStats(true)}
                 variant="outline"
                 size="sm"
-                className="bg-indigo-900/30 hover:bg-indigo-900/50 border-indigo-500/50 text-indigo-300 backdrop-blur-sm"
+                className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 hover:from-indigo-500/20 hover:to-purple-500/20 border-indigo-500/30 text-indigo-200 backdrop-blur-xl transition-all duration-300"
               >
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Stats
@@ -585,7 +599,7 @@ const CharacterViewer = () => {
                 onClick={exportCharacters}
                 variant="outline"
                 size="sm"
-                className="bg-green-900/30 hover:bg-green-900/50 border-green-500/50 text-green-300 backdrop-blur-sm"
+                className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 hover:from-emerald-500/20 hover:to-green-500/20 border-emerald-500/30 text-emerald-200 backdrop-blur-xl transition-all duration-300"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Exportar
@@ -595,7 +609,10 @@ const CharacterViewer = () => {
                 variant={viewMode === 'gallery' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('gallery')}
-                className="bg-purple-900/30 hover:bg-purple-900/50 border-purple-500/50 backdrop-blur-sm"
+                className={viewMode === 'gallery' 
+                  ? "bg-gradient-to-r from-purple-500/30 to-pink-500/30 border-purple-500/50 text-white backdrop-blur-xl"
+                  : "bg-black/20 hover:bg-black/40 border-white/10 backdrop-blur-xl hover:border-white/20"
+                }
               >
                 <Grid className="w-4 h-4 mr-2" />
                 Galeria
@@ -605,7 +622,10 @@ const CharacterViewer = () => {
                 variant={viewMode === 'detailed' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('detailed')}
-                className="bg-purple-900/30 hover:bg-purple-900/50 border-purple-500/50 backdrop-blur-sm"
+                className={viewMode === 'detailed' 
+                  ? "bg-gradient-to-r from-purple-500/30 to-pink-500/30 border-purple-500/50 text-white backdrop-blur-xl"
+                  : "bg-black/20 hover:bg-black/40 border-white/10 backdrop-blur-xl hover:border-white/20"
+                }
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Detalhes
